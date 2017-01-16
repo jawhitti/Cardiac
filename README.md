@@ -4,7 +4,8 @@ C# / .NET implementation of the CARDIAC Cardboard computer
 ## Overview
 This project is a compiler, runtime and debugger for the [CARDIAC - A **Cardboard Illustrative Aid to Computation**](https://en.wikipedia.org/wiki/CARDboard_Illustrative_Aid_to_Computation). 
 The goal of the project is to implement a simple, but realistic compiler and interpreter.  The compiler implements a simple language I call CARDIASM which
-is a simple assembly.  
+is a simple assembly language derived from the CARDIAC instruction set.  Sadly the limitations of the CARDIAC hardware platform preclude porting a more common
+language like C.  
 
 ## Compiling the code
 The code is a Visual Studio 201S solution primarily providing three applications
