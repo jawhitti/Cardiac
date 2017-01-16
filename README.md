@@ -51,15 +51,19 @@ OUT result
 HRS 0  
 ```
 
-If you save the above to **add.cardiasm extension you can compile it via the command line below:
-  
-``
-cardiasm /debug+ add.cardiasm
-``
-  
-This will produce two files:
-* **add.cardimg** - an executable image suitable for executing with cardiac.exe
-* **add.cardb**   - a cardiac program database (roughly analogous to a ".pdb") useful for debugging
+#### Definitions
+DEF statements can appear anyway.  They can reference each other.  For boolean operations **true** can be 
+defined as 1 but I recommend defining **false** as -1 because of the way the TAC instruction works.
+
+```
+DEF true 1
+DEF false -1
+DEF a true
+DEF b false
+```
+CARDIASM does not distinguish between constant values and variables.  However the compiler is 
+smart enough to omit un-referenced definitions from the compiled image so you can define variables
+liberally.  Note that there is no notion of scope; all definitions are visible everywhere. 
 
 #### Comments
 Comments in CARDIASM begin with two slashes.  They can be standalone or at the end of a line. 
@@ -68,25 +72,27 @@ Comments in CARDIASM begin with two slashes.  They can be standalone or at the e
 * Labels can be used anywhere and are denoted via labels.  For example the follow program displays
 the values 1 through 100
 ```
-/This program counts to 100
+//This program counts to 100
 
 DEF n    100  
 DEF cntr 000 
 
-CLA	00		//Initialize the counter to 1 (address 00 always contains 1)
+CLA	00              //Initialize the counter to 1 (address 00 always contains 1)
 STO	cntr	
 
 loop:
-	CLA	n	//Load n into accumulator
+	CLA	n       //Load n into accumulator
 	TAC	exit    //If n < 0, exit
-	OUT	cntr	//Output cntr
+	OUT	cntr    //Output cntr
 	
-	CLA	cntr	//Load cntr into accumulator
-	ADD	00		//address 0 always holds 1 so this is a clever way to increment
-	STO	cntr    //store counter
+        // cntr++
+	CLA	cntr    
+	ADD	00      //clever way to implement++ (00 always contains the value 1)
+	STO	cntr    
 	
+        // n--
 	CLA	n	    
-	SUB	00      //Decrement n
+	SUB	00
 	STO	n
 	
 	JMP	loop
@@ -104,13 +110,29 @@ the "Halt-Reset" at the end of the function with a jump back to the calling loca
 ```
 divides_entry:
 	CLA 99
-	STO divides_exit
+	STO divides_exit //override the "HRS" at divides_exit with a jump to the return address
+                         //stored in memory location 99
+
         ...
-	HRS 0  //return from "divides"
+
+divides_exit:
+	HRS 0  //This will be a JMP instruction by the time it executes
 ```
 
+### Compiling programs
+If you save the first example above to **add.cardiasm** you can compile it via the command line below:
+  
+``
+cardiasm /debug+ add.cardiasm
+``
+  
+This will produce two files:
+* **add.cardimg** - an executable image suitable for executing with cardiac.exe
+* **add.cardb**   - a cardiac program database (roughly analogous to a ".pdb") useful for debugging
+
+
 ### Running a program
-To run the program you can just run it like this:
+To run the program you can just pass the name of the compiled image to cardiac.exe:
 ```
 C:\> cardiac add.cardimg
 2
@@ -118,7 +140,7 @@ C:\> cardiac add.cardimg
 ### Using the debugger
 To debug the program run the debugger as follows:
 ```
-cardbg add.cardimg
+C:\> cardbg add.cardimg
 ```
 
 You should see a display like the following:
