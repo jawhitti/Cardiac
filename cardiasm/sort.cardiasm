@@ -1,0 +1,22 @@
+﻿//given m and n puts the smaller value into m and the larger value into n
+
+DEF m 6
+DEF n 5
+DEF tmp 0
+
+CLA m
+SUB n
+TAC end
+
+swap:
+	CLA m
+	STO tmp
+	CLA n
+	STO m
+	CLA tmp
+	STO n
+
+end:
+	OUT m  //should always be smaller value
+	OUT n  //should always be bigger value
+	HRS 0

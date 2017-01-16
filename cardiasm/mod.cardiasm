@@ -1,0 +1,22 @@
+﻿//Given postive integers n and an m outputs the result of n mod m
+
+DEF n 100
+DEF m 7
+DEF mod_result 0
+
+CLA n
+STO mod_result	
+
+mod_loop:
+	SUB m  //n -= m
+	TAC done
+	JMP mod_loop
+
+done:
+	//at this point the accumulator holds a negative value.
+	//add m back to it to get the result of m mod n
+	ADD m
+	STO mod_result
+	OUT mod_result
+
+HRS 00

@@ -1,0 +1,49 @@
+﻿//Given positive integers n and an m places a value in the accumulator:
+//  1: n/m has remainder 0
+// -1: n/m has remainder > 0
+
+DEF n 100
+DEF m 10
+DEF mod_result 0
+DEF tmp 0
+DEF zero 0
+DEF true 1
+DEF false -1
+
+
+	CLA n
+	STO mod_result	
+
+	mod_loop:
+		SUB m  //n -= m
+		TAC done
+		JMP mod_loop
+
+	done:
+		//at this point the accumulator holds a negative value.
+		//add m back to it to get the result of m mod n
+		ADD m
+		STO mod_result
+
+	//mod_result is >=0.  Subtract it from zero. Result will be 
+	//negative if mod_result > 0
+	CLA zero
+	SUB mod_result
+	TAC not_divisible
+
+	divisible:
+		//they *are* equal
+		CLA true
+		JMP end
+
+	not_divisible:
+		CLA false
+
+	end:
+		STO tmp
+		OUT tmp
+		HRS 0
+
+
+
+

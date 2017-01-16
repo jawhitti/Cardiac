@@ -1,0 +1,166 @@
+﻿//FIZZBUZZ on the CARDIAC!
+
+//Constant definitions
+DEF true		 1
+DEF false		-1
+DEF zero		 0
+DEF three		 3
+DEF five		 5
+DEF fizz_output -3
+DEF buzz_output -5
+DEF fizzbuzz_output -15 
+
+//variable declarations
+DEF	main_loop_index  99  //note that this will go 99->0 inclusive  
+DEF i		 	 0 
+DEF is_fizz		 false
+DEF is_buzz		 false
+DEF m			 0
+DEF n			 0
+DEF mod_result	 0
+DEF tmp			 0
+
+loop:
+	//if main_loop_index < 0 goto exit
+	CLA	main_loop_index	
+	TAC	exit      
+	
+	//i++
+	CLA	i		
+	ADD	00		//address 0 always holds 1 so this is a clever way to increment
+	STO	i	    
+
+//Test if n mod 3 == 0 and store result into is_fizz
+test_fizz:	
+    //n = i
+	STO n
+
+	//m = 3
+	CLA three
+	STO m
+	JMP divides_entry //test if n mod 3 == 0
+
+store_fizz:
+	STO is_fizz
+
+test_buzz:
+	//n = i
+	CLA i
+	STO n
+
+	//m = 5
+	CLA five
+	STO m
+
+	JMP divides_entry //test if n mod 5 == 0
+
+store_buzz:
+	STO is_buzz
+
+	JMP output
+
+next_i:
+	//main_loop_index--
+	CLA	main_loop_index	    
+	SUB	00
+	STO	main_loop_index
+	
+	JMP	loop
+
+exit:	
+	HRS 0  //Exit program
+
+
+/////////////////////////////////////////////////////////////
+//DIVIDES
+//
+// expects inputs in m and n
+// returns true or false in the accumulator
+////////////////////////////////////////////////////////////
+divides_entry:
+	CLA 99
+	STO divides_exit
+
+	CLA n
+	STO mod_result	
+
+mod_loop:
+	SUB m  //n -= m
+	TAC done
+	JMP mod_loop
+
+done:
+	//at this point the accumulator holds a negative value.
+	//add m back to it to get the result of m mod n
+	ADD m
+	STO mod_result
+
+//mod_result is >=0.  Subtract it from zero. Result will be 
+//negative if mod_result > 0
+CLA zero
+SUB mod_result
+TAC not_divisible
+
+divisible:
+	//they *are* equal
+	CLA true
+	JMP end
+
+not_divisible:
+	CLA false
+
+end:
+	STO tmp
+
+//This should be overwritten by the time we get here
+//to be a jump back to the caller
+divides_exit:
+	HRS 0  //return from "divides"
+
+
+/////////////////////////////////////////////////////////////
+//OUTPUT
+//
+// expects inputs in i, is_fizz and is_buzz
+// outputs one of the following:
+// i if is_fizz and is_buzz are both false
+// fizz_output if is_fizz is true and is_buzz is false
+// buzz_output if is_fizz is false and is_buss is true
+// fizzbuzz_output if both is_fizz and is_buzz is true
+////////////////////////////////////////////////////////////
+
+output:
+
+	CLA 99
+	STO output_exit
+
+	CLA is_fizz
+	TAC not_fizz
+		//fizz is true
+		CLA is_buzz
+		TAC not_buzz1
+			//buzz is true
+			OUT fizzbuzz_output
+			JMP output_exit
+
+		not_buzz1:
+			//fizz is true, buzz is false
+			OUT fizz_output 
+			JMP output_exit
+
+		not_fizz:
+			//fizz is false
+			CLA is_buzz 
+			TAC not_buzz2
+				//fizz is false, buzz is true
+				OUT buzz_output
+				JMP output_exit
+
+			not_buzz2:
+				//fizz and buzz are both false
+				OUT i 
+
+//This should be overwritten by the time we get here
+//to be a jump back to the caller
+output_exit:
+	HRS 0  

@@ -1,0 +1,27 @@
+﻿//This program counts to 100
+
+DEF	n	 100  
+DEF cntr 000 
+
+CLA	00		//Initialize the counter to 1 (address 00 always contains 1)
+STO	cntr	
+
+loop:
+	CLA	n		//Load n into accumulator
+	TAC	exit    //If n < 0, exit
+	OUT	cntr	//Output cntr
+	
+	CLA	cntr	//Load cntr into accumulator
+	ADD	00		//address 0 always holds 1 so this is a clever way to increment
+	STO	cntr    //store counter
+	
+	CLA	n	    
+	SUB	00      //Decrement n
+	STO	n
+	
+	JMP	loop
+
+exit:	
+	HRS	00
+
+

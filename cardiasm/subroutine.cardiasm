@@ -1,0 +1,24 @@
+﻿DEF one 1
+DEF two 2
+DEF output_temp 0
+
+CLA one
+JMP output_accumulator
+CLA two
+JMP output_accumulator
+HRS 0
+
+output_accumulator:
+	STO	output_temp
+	CLA	99	
+
+	//This line should adjust the instruction 
+	//after the label output_accumulator_exit
+	//to be a jmp instruction that will jump 
+	//back to the next instruction after the
+	//one that jumped into this function.
+	STO	output_accumulator_exit
+	OUT	output_temp
+	CLA	output_temp
+output_accumulator_exit:
+	JMP	00

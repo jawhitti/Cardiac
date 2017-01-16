@@ -1,0 +1,39 @@
+﻿//given m and n stores:
+// 1 in accumulator if the values are equal
+// -1 if the values are not equal
+
+DEF m -5
+DEF n -6
+DEF tmp 0
+DEF true 1
+DEF false -1
+
+CLA m
+SUB n
+TAC compare
+
+swap:
+	CLA m
+	STO tmp
+	CLA n
+	STO m
+	CLA tmp
+	STO n
+
+compare:
+	//smaller value is in m, larger in n
+	CLA m
+	SUB n
+	TAC not_equal
+
+	//they *are* equal
+	CLA true
+	JMP end
+
+not_equal:
+	CLA false
+
+end:
+	STO tmp
+	OUT tmp
+	HRS 0

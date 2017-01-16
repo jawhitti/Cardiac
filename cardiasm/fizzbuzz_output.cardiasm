@@ -1,0 +1,41 @@
+﻿DEF i 11
+DEF is_fizz 1
+DEF is_buzz 1
+DEF fizz_output -1
+DEF buzz_output -2
+DEF fizzbuzz_output -3 
+
+
+output:
+	CLA is_fizz
+	TAC not_fizz
+		//fizz is true
+		CLA is_buzz
+		TAC not_buzz1
+			//buzz is true
+			OUT fizzbuzz_output
+			JMP output_exit
+
+		not_buzz1:
+			//fizz is true, buzz is false
+			OUT fizz_output 
+			JMP output_exit
+
+		not_fizz:
+			//fizz is false
+			CLA is_buzz 
+			TAC not_buzz2
+				//fizz is false, buzz is true
+				OUT buzz_output
+				JMP output_exit
+
+			not_buzz2:
+				//fizz and buzz are both false
+				OUT i 
+
+output_exit:
+	HRS 00
+
+
+
+
