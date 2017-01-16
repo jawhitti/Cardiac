@@ -34,8 +34,6 @@ namespace Cardiac.Core
 
                 for (int i = firstInstruction; i < lastInstruction; i += 1)
                 {
-                    if (rawInstructions[i + 1] == 9)
-                        Console.WriteLine("whoah");
                     if (rawInstructions[i] < 100 && rawInstructions[i] != 2)
                     {
                         //This is an INP so the next card should be an instruction...
