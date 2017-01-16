@@ -16,12 +16,13 @@ The code is a Visual Studio 201S solution primarily providing three applications
 ### cardiasm.exe
 This compiler takes CARDIASM files as input and produces compiled images (".cardimg").  These images can be run via cardiac.exe or
 debugged via cardb.exe.  The compiler will optionally produce a simple program database (".cardb") if you pass it a "/debug+" flag on the
-command-line.  This application uses the ANTLR library to parse cardiasm source files and produces executable images as described 
+command line.  This application uses the ANTLR library to parse cardiasm source files and produces executable images as described 
 [here](https://www.cs.drexel.edu/~bls96/museum/cardiac.html).
   
 ### cardiac.exe  
-This is cardiac interpreter.  Most of the "real" code is in Cardiac.Core.dll; cardiac.exe mostly just accepts command-line parameters
-and invokes the Interpreter.  The Interpreter is availalbe as a general-purpose class and is designed to be easily hosted and "tweaked".
+This is the cardiac interpreter, analogous to "java.exe"  Most of the "real" code is in Cardiac.Core.dll; 
+cardiac.exe mostly just accepts command-line parameters and invokes the Interpreter.  The Interpreter 
+is available as a general-purpose class and is designed to be easily hosted and "tweaked".
 cardiac.exe can optionally emit a profile trace via the "/profile+" switch.
   
 ### cardbg.exe
@@ -60,8 +61,10 @@ This will produce two files:
 * **add.cardimg** - an executable image suitable for executing with cardiac.exe
 * **add.cardb**   - a cardiac program database (roughly analogous to a ".pdb") useful for debugging
 
-#### Notes
-* Comments in CARDIASM begin with two slashes.  They can be standalone or at the end of a line. 
+#### Comments
+Comments in CARDIASM begin with two slashes.  They can be standalone or at the end of a line. 
+
+#### Labels
 * Labels can be used anywhere and are denoted via labels.  For example the follow program displays
 the values 1 through 100
 ```
@@ -91,26 +94,20 @@ loop:
 exit:	
 	HRS	00
 ```
-
-* CARDIAC has only one register and no stack so self-modifying code can be useful.  For this reason the language
+  
+#### Self-modifying code 
+CARDIAC has only one register and no stack so self-modifying code can be useful.  For this reason the language
 supports storing values to addresses denoted by labels. The following function from fizzbuzz.cardiasm uses this 
 capability in the line STO divides_exit.  This provides a crude way of implementing subroutines by replacing
 the "Halt-Reset" at the end of the function with a jump back to the calling location.
 
 ```
-/////////////////////////////////////////////////////////////
-//DIVIDES
-//
-// expects inputs in m and n
-// returns true or false in the accumulator
-////////////////////////////////////////////////////////////
 divides_entry:
 	CLA 99
 	STO divides_exit
         ...
 	HRS 0  //return from "divides"
 ```
-
 
 ### Running a program
 To run the program you can just run it like this:
