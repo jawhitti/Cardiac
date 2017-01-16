@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cardbg", "cardbg\cardbg.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cardiac.Core", "Cardiac.Core\Cardiac.Core.csproj", "{9F2AF821-06F3-4418-AB68-76D9A0FCCFC3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{3F50BA08-3473-4D54-BF70-DAA3900304DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F7F15FE-ECD9-48B4-957D-B5670CA58609} = {3F50BA08-3473-4D54-BF70-DAA3900304DA}
+		{69C7A9F5-72AF-4C09-A67D-F4D6C29D3432} = {3F50BA08-3473-4D54-BF70-DAA3900304DA}
+		{9F4DBA00-6E71-4FDD-8667-B9A5D3DAEAAA} = {3F50BA08-3473-4D54-BF70-DAA3900304DA}
 	EndGlobalSection
 EndGlobal
