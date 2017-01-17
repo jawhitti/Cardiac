@@ -38,8 +38,9 @@ However I did not want developers to worry about memory addresses so the languag
 features (defining constants, variables and labels) to make it easier to write code for the platform.
 
 For instance, a very simple cardiac program to add 1+1 and output the result is shown below: This program defines
-a and b as 1 then loads a into the Accumulator register and adds b.  The result is stored into "result" and result is then output. 
-The final instruction (HRS 0) is a Halt-Reset which just ends the program.
+three variables (**a**, **b** and **result**). a is defined as 1 and b is defined as a (so, 1 by transitivity).
+The CLA loads from the address into the Accumulator register and adds b.  The result is stored into "result" 
+and the OUT statement outputs the result. The final instruction (HRS 0) is a Halt-Reset which just ends the program.
 
 ```
 DEF a 1  
@@ -54,7 +55,7 @@ HRS 0
 ```
 
 #### Definitions
-DEF statements can appear anyway.  They can reference each other.  For boolean operations **true** can be 
+DEF statements can appear anywhere in the program.  They can reference each other.  For boolean operations **true** can be 
 defined as 1 but I recommend defining **false** as -1 because of the way the TAC instruction works.
 
 ```
@@ -179,6 +180,10 @@ C:\> cardiac add.cardimg 2
 Unhandled Exception: System.InvalidOperationException: The program requires input but no input available
 
 ```
+  
+**cardiac.exe** sends all output to the console. If you want something more elaborate you can host
+the Interpreter in your own process and handle the *Output* event.  (See the source code to cardiac.exe
+for an example).
   
 ### Using the debugger
 To debug the program run the debugger as follows:
