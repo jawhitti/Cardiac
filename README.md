@@ -3,9 +3,8 @@ C# / .NET implementation of the CARDIAC Cardboard computer
 
 ## Overview
 This project is a compiler, runtime and debugger for the [CARDIAC - A **Cardboard Illustrative Aid to Computation**](https://en.wikipedia.org/wiki/CARDboard_Illustrative_Aid_to_Computation). 
-The goal of the project is to implement a simple, but realistic compiler and interpreter.  The compiler implements a simple language I call CARDIASM which
-is a simple assembly language derived from the CARDIAC instruction set.  Sadly the limitations of the CARDIAC hardware platform preclude porting a more common
-language like C.  
+The goal of the project is to implement a simple, but realistic compiler,interpreter and debugger. 
+  
 
 ## Compiling the code
 The code is a Visual Studio 201S solution primarily providing three applications
@@ -14,33 +13,47 @@ The code is a Visual Studio 201S solution primarily providing three applications
 ## Applications
 
 ### cardiasm.exe
-This compiler takes CARDIASM files as input and produces compiled images (".cardimg").  These images can be run via cardiac.exe or
-debugged via cardb.exe.  The compiler will optionally produce a simple program database (".cardb") if you pass it a "/debug+" flag on the
-command line.  This application uses the ANTLR library to parse cardiasm source files and produces executable images as described 
+The compiler implements a simple language I call CARDIASM which is a simple assembly language derived from the 
+CARDIAC instruction set.  Sadly the limitations of the CARDIAC hardware platform preclude porting a more common
+language like C.  
+
+The compiler transforms source files (".cardiasm") int compiled binaries(".cardimg").  These images can be executed via **cardiac.exe** or
+debugged via **cardb.exe**.  The compiler will optionally produce a simple program database (".cardb") if you pass it a "/debug+" flag on the
+command line, which will enable integrated source debugging.
+
+**cardiasm** uses the ANTLR library to parse cardiasm source files. Executable images follow the format described  
 [here](https://www.cs.drexel.edu/~bls96/museum/cardiac.html).
   
 ### cardiac.exe  
-This is the cardiac interpreter, analogous to "java.exe"  Most of the "real" code is in Cardiac.Core.dll; 
-cardiac.exe mostly just accepts command-line parameters and invokes the Interpreter.  The Interpreter 
-is available as a general-purpose class and is designed to be easily hosted and "tweaked".
-cardiac.exe can optionally emit a profile trace via the "/profile+" switch.
+**cardiac.exe** is the cardiac interpreter (analogous to "java.exe")  Most of the "real" code is in Cardiac.Core.dll; 
+cardiac.exe mostly just accepts command-line parameters and invokes the Interpreter it contains.  The Interpreter 
+is available as a general-purpose class and is designed to be easily hosted and "tweaked" in other host applications.
+cardiac.exe can optionally emit a profile trace via the "/profile+" switch.  Currently there are no tools that consume
+this profile information but it should be straightforward to build one.
   
 ### cardbg.exe
-This is an interactive debugger. Right now it only supports single-stepping through the code.  If no .cardb file is found it will display
-disassembly of the raw CARDIAC opcodes; otherwise it will display source code and an enhanced view of CARDIAC memory during debugging.
+**cardbg.exe** is a simple interactive debugger. Right now it only supports single-stepping through the code.  
+The debugger displays the contents of the memory along with a disassembly of the raw CARDIAC opcodes. Pressing ENTER
+single-steps over the source code.
+  
+If a program database (.cardb) file is located the memory display is enhanced and the disassembly view is 
+replaced with an enhanced "source code" view. 
 
 ## Quick tour
 
 ### The CARDIASM language
 
 The CARDIASM language is built around the opcodes defined in the [manual](https://www.cs.drexel.edu/~bls96/museum/CARDIAC_manual.pdf). 
-However I did not want developers to worry about memory addresses so the language adds a few familiar
-features (defining constants, variables and labels) to make it easier to write code for the platform.
+An important design goal was making it possible to develop code without worrying about address allocation, so the
+language adds a few familiar "C-like" features (defining constants, variables and labels).
 
-For instance, a very simple cardiac program to add 1+1 and output the result is shown below: This program defines
-three variables (**a**, **b** and **result**). a is defined as 1 and b is defined as a (so, 1 by transitivity).
-The CLA loads from the address into the Accumulator register and adds b.  The result is stored into "result" 
-and the OUT statement outputs the result. The final instruction (HRS 0) is a Halt-Reset which just ends the program.
+A very simple cardiac program to add 1+1 and output the result is shown below: This program defines
+three variables (*a*, *b* and *result*). *a* is defined as 1 and *b* is defined as *a* (so, 1 by transitivity). 
+  
+The CLA instruction is the first executable statement in the program. CLA loads *a* into the Accumulator register; the 
+ADD instruction adds *b* to *a* and stores it in the accumulator.  The CARDIAC can't output directly from the accumulator
+so "STO result" saves the result into a variable that can be passed to the OUT instruction. The final instruction (HRS 0)
+is a "Halt and Reset" which just ends the program.
 
 ```
 DEF a 1  
@@ -66,15 +79,21 @@ DEF b false
 ```
 CARDIASM does not distinguish between constant values and variables.  However the compiler is 
 smart enough to omit un-referenced definitions from the compiled image so you can define variables
-liberally.  Note that there is no notion of scope; all definitions are visible everywhere. 
+liberally.  CARDIASM has no notion of scope; all definitions are visible everywhere.
+  
+(Note that expressions are not currently allowed as rvalues so expressions like "DEF c a+b" are not accepted). 
 
 #### Comments
-Comments in CARDIASM begin with two slashes.  They can be standalone or at the end of a line. 
+CARDIASM uses C++/Java-style comments. Comments can be standalone or at the end of a line, exactly like most "C-like" languages.
 
 #### Labels
-* Labels can be used anywhere and are denoted via the familiar C syntax of "<label>: statement". 
+Labels are critical for any code with loops. The CARDIAC lacks a native stack, so labels are also important
+for implementing subroutines. 
+
+Labels can be places anywhere and are denoted via the familiar C syntax of "<label>: statement".   
+  
 The follow program displays the values 1 through 100 and uses labels as targets for the JMP and 
-TAC statements. This allows code to be *relocatable*.
+TAC statements. 
 ```
 //This program counts to 100
 
@@ -105,11 +124,16 @@ exit:
 	HRS	00
 ```
   
-#### Self-modifying code 
-CARDIAC has only one register and no stack so self-modifying code can be useful.  For this reason the language
-supports storing values to addresses denoted by labels. The following function from fizzbuzz.cardiasm uses this 
-capability in the line STO divides_exit.  This provides a crude way of implementing subroutines by replacing
-the "Halt-Reset" at the end of the function with a jump back to the calling location.
+#### Subroutines and Self-modifying code 
+CARDIAC has only one register and no stack so subroutines are useful.  One way to implement them is
+via self-modifying code. CARDIASM helps enable this via a curious construct - the language
+supports storing values to *labels*.  (This construct is very similar to POKE in old-school platforms).
+
+The following function from fizzbuzz.cardiasm demonstrates this usage in the line **STO divides_exit**.  This
+line takes the value from the accumulator (an address, presumably) and stores it at the location labeled
+"divides_exit".  That location contains a "Halt and reset by default" but after the STO operation the code
+will be patched to hold something else (presumably a JMP instruction jumping back to the calling location.
+  
 
 ```
 divides_entry:
