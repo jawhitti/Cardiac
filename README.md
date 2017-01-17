@@ -7,20 +7,22 @@ The goal of the project is to implement a simple, but realistic compiler,interpr
   
 
 ## Compiling the code
-The code is a Visual Studio 201S solution primarily providing three applications
+The code is a Visual Studio 201S solution primarily providing three applications described below.  You should be able
+to just open the project and build (Ctrl-Shift-B). Binaries will all be sent to a "bin" folder under the root directory
+of the solution.
 
 
 ## Applications
 
 ### cardiasm.exe
-The compiler implements a simple language I call CARDIASM which is a simple assembly language derived from the 
+**cardiasm.exe** is a compiler for a simple language I call CARDIASM. CARDIASM is a simple assembly language derived from the 
 CARDIAC instruction set.  Sadly the limitations of the CARDIAC hardware platform preclude porting a more common
 language like C.  
 
-The compiler transforms source files (".cardiasm") int compiled binaries(".cardimg").  These images can be executed via **cardiac.exe** or
-debugged via **cardb.exe**.  The compiler will optionally produce a simple program database (".cardb") if you pass it a "/debug+" flag on the
-command line, which will enable integrated source debugging.
+The compiler transforms source files (".cardiasm") int compiled binaries(".cardimg").  These images can be executed via **cardiac.exe** or debugged via **cardb.exe**.  The compiler will optionally produce a simple program database (".cardb") if you pass it a "/debug+" flag on the command line, which will enable integrated source debugging.  See the Quick Tour below for more information on the
+CARDIASM language
 
+#### Implementation notes
 **cardiasm** uses the ANTLR library to parse cardiasm source files. Executable images follow the format described  
 [here](https://www.cs.drexel.edu/~bls96/museum/cardiac.html).
   
