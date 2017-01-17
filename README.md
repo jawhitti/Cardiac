@@ -34,8 +34,10 @@ disassembly of the raw CARDIAC opcodes; otherwise it will display source code an
 ### The CARDIASM language
 
 The CARDIASM language is built around the opcodes defined in the [manual](https://www.cs.drexel.edu/~bls96/museum/CARDIAC_manual.pdf). 
-However I did not want developers to worry about memory addresses so the language also allows DEF statements to define constants 
-and variables.For instance, a very simple cardiac program to add 1+1 and output the result is shown below: This program defines
+However I did not want developers to worry about memory addresses so the language adds a few familiar
+features (defining constants, variables and labels) to make it easier to write code for the platform.
+
+For instance, a very simple cardiac program to add 1+1 and output the result is shown below: This program defines
 a and b as 1 then loads a into the Accumulator register and adds b.  The result is stored into "result" and result is then output. 
 The final instruction (HRS 0) is a Halt-Reset which just ends the program.
 
@@ -69,8 +71,9 @@ liberally.  Note that there is no notion of scope; all definitions are visible e
 Comments in CARDIASM begin with two slashes.  They can be standalone or at the end of a line. 
 
 #### Labels
-* Labels can be used anywhere and are denoted via labels.  For example the follow program displays
-the values 1 through 100
+* Labels can be used anywhere and are denoted via the familiar C syntax of "<label>: statement". 
+The follow program displays the values 1 through 100 and uses labels as targets for the JMP and 
+TAC statements. This allows code to be *relocatable*.
 ```
 //This program counts to 100
 
@@ -130,6 +133,11 @@ This will produce two files:
 * **add.cardimg** - an executable image suitable for executing with cardiac.exe
 * **add.cardb**   - a cardiac program database (roughly analogous to a ".pdb") useful for debugging
 
+The actual executable image will be in the form described at 
+[the Drexel page](https://www.cs.drexel.edu/~bls96/museum/cardiac.html). **.cardimg** files are 
+just text files where each line holds a single value (I chose text over binary because it's 
+easier to read and manipulate). 
+
 
 ### Running a program
 To run the program you can just pass the name of the compiled image to cardiac.exe:
@@ -137,6 +145,41 @@ To run the program you can just pass the name of the compiled image to cardiac.e
 C:\> cardiac add.cardimg
 2
 ```
+
+#### I/O
+The CARDIAC is not very well-suited for interactive I/O.  The only I/O instruction is 
+a blocking read, and the CARDIAC has no way to deal with text.  **cardiac.exe** supports 
+passing arguments on the command-line.  It is up to you to pass the right number.  If
+a program tries to read input and none is available cardiac.exe will crash with an
+InvalidOperationException and the text "The Program requires input but none is available".
+  
+The following program expects two arguments and outputs their sum:
+```
+DEF a 1
+DEF b 1
+DEF result 0
+
+INP a
+INP b
+
+CLA a
+ADD b
+STO result
+OUT result
+HRS 0
+```
+
+To run this program pass a and b on the command line:
+```
+C:\> cardiac add.cardimg 1 1 
+2
+C:\> cardiac add.cardimg 2 3 
+5
+C:\> cardiac add.cardimg 2 
+Unhandled Exception: System.InvalidOperationException: The program requires input but no input available
+
+```
+  
 ### Using the debugger
 To debug the program run the debugger as follows:
 ```
